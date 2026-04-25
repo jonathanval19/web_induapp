@@ -1,9 +1,11 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, inject, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { CurrencyPipe } from '@angular/common';
+import { ProductService, Product } from './product.service';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, CurrencyPipe],
   template: `
     <div class="App">
       <nav>
@@ -37,17 +39,23 @@ import { RouterOutlet } from '@angular/router';
             <p>Soluciones a medida para cada necesidad gastronómica.</p>
           </div>
           <div class="products-grid">
-            @for (item of [1,2,3,4,5,6]; track item) {
+            @for (product of products(); track product.producto_id) {
               <div class="product-card">
-                <div class="product-image">Imagen del Producto</div>
-                <h3>Producto Industrial {{item}}</h3>
+                <div class="product-image">
+                   <span style="font-size: 3rem; opacity: 0.2;">🍴</span>
+                </div>
+                <h3>{{product.producto_descripcion}}</h3>
                 <p style="color: var(--text-light); font-size: 0.9rem; margin-bottom: 1rem;">
-                  Descripción breve del producto de alta gama fabricado en acero.
+                  Código: {{product.producto_cod}} - Equipamiento de alta gama fabricado por Induval.
                 </p>
                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                  <span style="font-weight: bold; color: var(--primary);">Desde 599€</span>
+                  <span style="font-weight: bold; color: var(--primary);">{{product.producto_valor | currency:'EUR'}}</span>
                   <button style="color: var(--primary); font-weight: 600; background: none;">Detalles →</button>
                 </div>
+              </div>
+            } @empty {
+              <div style="text-align: center; width: 100%; padding: 3rem; grid-column: 1 / -1;">
+                <p>Cargando catálogo de productos...</p>
               </div>
             }
           </div>
@@ -108,6 +116,14 @@ import { RouterOutlet } from '@angular/router';
   `,
   styles: [],
 })
-export class App {
-  protected readonly title = signal('web-induapp');
+export class App implements OnInit {
+  private productService = inject(ProductService);
+  protected readonly products = signal<Product[]>([]);
+
+  ngOnInit() {
+    this.productService.getProducts().subscribe({
+      next: (data) => this.products.set(data),
+      error: (err) => console.error('Error fetching products', err)
+    });
+  }
 }
