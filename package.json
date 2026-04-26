@@ -5,7 +5,9 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
-    "watch": "ng build --watch --configuration development"
+    "watch": "ng build --watch --configuration development",
+    "config:dev": "node set-env.ts dev",
+    "config:prod": "node set-env.ts prod"
   },
   "private": true,
   "packageManager": "npm@11.8.0",
@@ -24,6 +26,7 @@
     "@angular/cli": "^21.2.8",
     "@angular/compiler-cli": "^21.2.0",
     "autoprefixer": "^10.5.0",
+    "dotenv": "^17.4.2",
     "postcss": "^8.5.10",
     "prettier": "^3.8.1",
     "tailwindcss": "^4.2.4",
